@@ -16,10 +16,23 @@ typedef struct _node{
     void * dados;
 }no;
 
+typedef struct _coord{
+    double x;
+    double y;
+    struct _coord * prox;
+}coordenadas;
+
+coordenadas * lerDados(char nomeArq[20]);
 
 no * criarNO(data *  dados);
 
-void inserirNO(no ** raiz, no * recebido);
+void inserirNO(no ** raiz, no * recebido, char param);
+
+void balancear(no ** raiz, coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char parametro);
+
+int ordenar(coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char parametro);
+
+no * contruirKDTREE(coordenadas * lista);
 
 
 #endif
