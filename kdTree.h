@@ -2,14 +2,18 @@
 #define _LISTA_
 
 typedef struct data{
-    double x;
-    double y;
-    int val;
+    int codIBGE;
+    char nome[100];
+    int capital;
+    int uf;
+    int siafi;
+    int ddd;
+    char fuso[100];
 }data;
 
 typedef struct _node{
-    double x;
-    double y;
+    float x;
+    float y;
     struct _node * pai;
     struct _node * esq;
     struct _node * dir;
@@ -22,7 +26,7 @@ typedef struct _coord{
     struct _coord * prox;
 }coordenadas;
 
-coordenadas * lerDados(char nomeArq[20]);
+void lerDados(no ** raiz,char nomeArq[30]);
 
 no * criarNO(data *  dados);
 

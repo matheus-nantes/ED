@@ -2,128 +2,92 @@
 #include<stdlib.h>
 #include"kdTree.h"
 
-coordenadas * lerDados(char nomeArq[20]){
-    float x, y;
-    coordenadas * lista = NULL;
-    coordenadas * aux;
-    coordenadas * p;
+void lerDados(no ** raiz,char nomeArq[30]){
+    data * dados = (data*) malloc(sizeof(data));
+    no * aux;
+    float auxX,auxY;
+    int cont = 0;
     FILE * arq;
-    arq = fopen("dados.txt", "r");
+    arq = fopen(nomeArq, "r");
     if (arq == NULL)  // Se houve erro na abertura
     {
         printf("Problemas na abertura do arquivo\n");
     }
-    int result;
-    while (fscanf(arq, "%f %f\n",&x, &y) !=EOF)
+    while (fscanf(arq, "%d,%[^,],%f,%f,%d,%d,%d,%d,%s\n",&(dados->codIBGE),&(dados->nome), &auxX,&auxY, &(dados->capital), &(dados->uf),&(dados->siafi),&(dados->ddd),&(dados->fuso)) !=EOF && cont <=10)
     {   
-        aux = calloc(1, sizeof(coordenadas));
-        aux->x = x;
-        aux->y = y;
-
-        if(lista == NULL){
-         lista = aux;
-        }
-        else{
-            p = lista;
-
-            while(p->prox != NULL){
-                p = p->prox;
-            }
-            p->prox = aux;
-        }
+        cont ++;
+        aux = criarNO(dados);
+        aux->x = auxX; 
+        aux->y = auxY;
+        inserirNO(raiz,aux,'x');//começa no x pois o compara com o primeiro nó ( "nível x"), e depois vai intercalando entre x e y ao passar de nivel.
+        dados = calloc(1, sizeof(data));
     }
     fclose(arq);
-    return lista;
 }
 
 
 no * criarNO(data *  dados){
     no * aux = calloc(1,sizeof(no));
     aux->dados = dados;
-    aux->x = dados->x;
-    aux->y = dados->y;
-    //printf("%d",((data *)(aux->dados))->val);
     return aux;
 }
 
 void inserirNO(no ** raiz, no * recebido, char param){
-    printf("\nBora inserir");
     if(*raiz == NULL){
-        printf("\nta nula");
         *raiz = recebido;
-        printf("\ninseriu o primeiro lugar");
+        printf("\ninseriu o primeiro lugar o valor: [%f,%f]\n",recebido->x,recebido->y);
     }
     else{
-        printf("Parametro %c | Valores: %p raiz: %.0f |  %p recebido %.0f",param, *raiz, (*raiz)->x,recebido, recebido->x);
         if(param == 'x'){
             if((*raiz)->x > recebido->x){//o novo nó é menor
-                printf("\nRecebido %f  é menor que raiz %f", (*raiz)->x, recebido->x);
+                printf("\nX: Recebido %.6f  menor que raiz %.6f", recebido->x, (*raiz)->x);
                 if((*raiz)->esq == NULL){//se não houver filho a esquerda, enserimos lá
-                    printf("\nBotou na esquerda");
+                    printf("\nBotou na esquerda\n");
                     (*raiz)->esq = recebido;
+                    recebido->pai = *raiz;
                 }
                 else{//se houver filho a esquerda, verificamos onde deve ser inserido
                     printf("\nChamou no FE");
-                    if(param == 'x'){
-                        inserirNO(&((*raiz)->esq), recebido, 'y');
-                    }
-                    else{
-                        inserirNO(&((*raiz)->esq), recebido, 'x');
-                    }
+                    inserirNO(&((*raiz)->esq), recebido, 'y');//invertendo o parametro, de x para y
+
                 }
             }
             else{//o novo nó é maior ou igual á raiz
-                printf("\nRecebido %f  é maior que raiz %f", recebido->x, (*raiz)->x);
+                printf("\nX: Recebido %.6f  maior que raiz %.6f", recebido->x, (*raiz)->x);
                 printf("\n filhoD : %p", (*raiz)->dir);
                 if((*raiz)->dir == NULL){//não tem filho a direita
-                    printf("\nBotou na direita");
+                    printf("\nBotou na direita\n");
                     (*raiz)->dir = recebido;
+                    recebido->pai = *raiz;
                 }
                 else{//tem filho a direita, comparamos novamente
                     printf("\nChamou no FD");
-                    if(param == 'x'){
-                    inserirNO(&((*raiz)->dir), recebido, 'y');
-                    }
-                    else{
-                        inserirNO(&((*raiz)->dir), recebido, 'x');
-                    }
+                    inserirNO(&((*raiz)->dir), recebido, 'y');//invertendo o parametro, de x para y
                 }
-
             }
         }
-        //-----------
-        else{
-            if((*raiz)->y > recebido->y){//o novo nó é menor
-            printf("\nRecebido %f  é menor que raiz %f", (*raiz)->x, recebido->x);
+        else{//parametro é y
+            if((*raiz)->y > recebido->y){//o novo nó é menor em y
+            printf("\nY: Recebido %f  menor que raiz %f", (*raiz)->y, recebido->y);
                 if((*raiz)->esq == NULL){//se não houver filho a esquerda, enserimos lá
-                    printf("\nBotou na esquerda");
+                    printf("\nBotou na esquerda\n");
                     (*raiz)->esq = recebido;
                 }
                 else{//se houver filho a esquerda, verificamos onde deve ser inserido
                     printf("\nChamou no FE");
-                    if(param == 'x'){
-                        inserirNO(&((*raiz)->esq), recebido, 'y');
-                    }
-                    else{
-                        inserirNO(&((*raiz)->esq), recebido, 'x');
-                    }
+                    inserirNO(&((*raiz)->esq), recebido, 'x');//invertendo o parametro, de y para x
                 }
             }
             else{//o novo nó é maior ou igual á raiz
-                printf("\nRecebido %f  é maior que raiz %f", recebido->x, (*raiz)->x);
+                printf("\nY: Recebido %f  maior que raiz %f", recebido->y, (*raiz)->y);
                 printf("\n filhoD : %p", (*raiz)->dir);
                 if((*raiz)->dir == NULL){//não tem filho a direita
-                    printf("\nBotou na direita");
+                    printf("\nBotou na direita\n");
                     (*raiz)->dir = recebido;
                 }
                 else{//tem filho a direita, comparamos novamente
                     printf("\nChamou no FD");
-                    if(param == 'x'){
-                    inserirNO(&((*raiz)->dir), recebido, 'y');
-                    }
-                    else{
-                        inserirNO(&((*raiz)->dir), recebido, 'x');
-                    }
+                    inserirNO(&((*raiz)->dir), recebido, 'x');//invertendo o parametro, de y para x
                 }
 
             }
@@ -134,7 +98,7 @@ void inserirNO(no ** raiz, no * recebido, char param){
     }
 
 }
-
+/*
 void balancear(no ** raiz, coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char parametro){//recebe a lista a ser ordenada, e qual o valor a ser comparado ( x ou y)
     printf("Bora balancear\n");
     int meio = ordenar(lista, inicio, fim, parametro);
@@ -178,7 +142,8 @@ void balancear(no ** raiz, coordenadas ** lista, coordenadas * inicio, coordenad
     }
     
 }
-
+*/
+/*
 int ordenar(coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char parametro){
     coordenadas * menor;
     coordenadas * aux = calloc(1,sizeof(coordenadas));
@@ -217,8 +182,8 @@ int ordenar(coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char 
     }//fim do bubble sort
     return (int)((contador/2)+0.5);
 }
-
-
+*/
+/*
 no * contruirKDTREE(coordenadas * lista){
     no * raiz;
     coordenadas * inicio;
@@ -235,30 +200,14 @@ no * contruirKDTREE(coordenadas * lista){
     balancear(&raiz,&lista,inicio,fim, 'x');
     return raiz;
 }
-
+*/
 
 
 
 int main(){
 
-    //criando raiz
     no * raiz = NULL;
-
-    //data * dados = malloc(sizeof(data));
-    //dados->x = 10;
-    //dados->y = 10;
-   // dados->val = 10;
-    //salvou os dados
-
-    //no * criado = criarNO(dados);//criou um novo nó
-
-    //inserirNO(&raiz, criado);
-    //printf("\nCabou");
-    //printf("+++%p+++\n", raiz);
-    
-    coordenadas * lista = lerDados("dados.txt");
-    printf("Criar KDTREE\n");
-    raiz = contruirKDTREE(lista);
+    lerDados(&raiz,"municipios.txt");
 
     return 0;
 }
