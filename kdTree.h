@@ -26,11 +26,19 @@ typedef struct _coord{
     struct _coord * prox;
 }coordenadas;
 
-void lerDados(no ** raiz,char nomeArq[30]);
+void montarLista(no ** raiz,char nomeArq[30]);
 
 no * criarNO(data *  dados);
 
 void inserirNO(no ** raiz, no * recebido, char param);
+
+void montarKD(no **raiz, no ** indice);
+
+void organizarKD(no ** raiz, no ** indice, no * inicio, no * fim, char parametro);
+
+int insertionSort(no**indice, no * atual, no * fim, char parametro);
+
+void troca(no * x, no * y);
 
 void balancear(no ** raiz, coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char parametro);
 
