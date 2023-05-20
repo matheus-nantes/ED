@@ -34,17 +34,19 @@ void inserirNO(no ** raiz, no * recebido, char param);
 
 void montarKD(no **raiz, no ** indice);
 
-void organizarKD(no ** raiz, no ** indice, no * inicio, no * fim, char parametro);
+void construirKD(no ** raiz, no ** indice, no * inicio, no * fim, char parametro);
 
 int insertionSort(no**indice, no * atual, no * fim, char parametro);
 
 void troca(no * x, no * y);
 
-void balancear(no ** raiz, coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char parametro);
+no * encontrarMaisProximo(no * raiz, float lat, float lon);
 
-int ordenar(coordenadas ** lista, coordenadas * inicio, coordenadas * fim, char parametro);
+no * buscaNO(no * raiz, float lat, float lon, char param);
 
-no * contruirKDTREE(coordenadas * lista);
+float calculaDistancia(no * a, no * b);
+
+void destruir(no * raiz);
 
 
 #endif
