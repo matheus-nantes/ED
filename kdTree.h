@@ -1,15 +1,30 @@
 #ifndef _LISTA_
 #define _LISTA_
 
+#define MAXCHAR 100
+
+
 typedef struct data{
     int codIBGE;
-    char nome[100];
+    char nome[MAXCHAR];
     int capital;
     int uf;
     int siafi;
     int ddd;
     char fuso[100];
 }data;
+
+typedef struct fastFood{
+    int id;
+    char address[MAXCHAR];
+    char categories[MAXCHAR];
+    char city[MAXCHAR];
+    char country[MAXCHAR];
+    char name[MAXCHAR];
+    int postalCode;
+    char province[MAXCHAR];
+    char websites[2000];
+} fastFood;
 
 typedef struct _node{
     float x;
@@ -20,6 +35,7 @@ typedef struct _node{
     void * dados;
 }no;
 
+
 typedef struct _coord{
     double x;
     double y;
@@ -28,7 +44,7 @@ typedef struct _coord{
 
 void montarLista(no ** raiz,char nomeArq[30]);
 
-no * criarNO(data *  dados);
+no * criarNO(void *  dados);
 
 void inserirNO(no ** raiz, no * recebido, char param);
 

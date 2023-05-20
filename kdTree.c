@@ -3,7 +3,7 @@
 #include<math.h>
 #include"kdTree.h"
 
-no * criarNO(data *  dados){
+no * criarNO(void *  dados){
     no * aux = (no*)malloc(sizeof(no));
     aux->dados = dados;
     aux->dir =NULL;
@@ -179,7 +179,7 @@ int insertionSort(no**indice, no * atual, no * fim, char parametro){
 
 void troca(no * x, no * y){
 
-   no * aux = calloc(1, sizeof(no));
+   no * aux = calloc(1, sizeof(no));//troca apenas dos valores dos nós
    aux->x = x->x;
    aux->y = x->y;
    aux->dados = (data*)x->dados;
