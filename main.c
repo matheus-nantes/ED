@@ -18,11 +18,11 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
         arq = fopen(nomeArq, "r");
     }
     if(strcmp(nomeArq,"municipios.txt")==0){
-        data * cidade = (data*) malloc(sizeof(data));
-        while (fscanf(arq, "%d,%[^,],%f,%f,%d,%d,%d,%d,%s\n",&(cidade->codIBGE),&(cidade->nome), &auxX,&auxY, &(cidade->capital), &(cidade->uf),&(cidade->siafi),&(cidade->ddd),&(cidade->fuso)) !=EOF)
+        cidade * cidad = (cidade*) malloc(sizeof(cidade));
+        while (fscanf(arq, "%d,%[^,],%f,%f,%d,%d,%d,%d,%s\n",&(cidad->codIBGE),&(cidad->nome), &auxX,&auxY, &(cidad->capital), &(cidad->uf),&(cidad->siafi),&(cidad->ddd),&(cidad->fuso)) !=EOF)
         {   
             cont ++;
-            aux = criarNO(cidade);
+            aux = criarNO(cidad);
             aux->x = auxX; 
             aux->y = auxY;
             
@@ -38,7 +38,7 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
                 p->dir = aux;
                 aux->pai = p;
             }
-            cidade = (data *)malloc(sizeof(data));
+            cidad = (cidade *)malloc(sizeof(cidade));
         }
     }
     else if(strcmp(nomeArq,"fastFood.txt")==0){
@@ -98,15 +98,15 @@ void print(no* recebido, char tipo){
     }
     else{//se os dados forem de uma cidade
         printf("\n--------------------\nCodigo IBGE: %d\nNome do municipio: %s\nCodigo UF: %d\nCapital: %d\nLatitude: %f\nLongitude: %f\nCodigo SIAFI: %d\nDDD: %d\nFuso Horario: %s\n--------------------\n",
-        ((data*)(recebido->dados))->codIBGE,
-        ((data*)(recebido->dados))->nome,
-        ((data*)(recebido->dados))->uf,
-        ((data*)(recebido->dados))->capital,
+        ((cidade*)(recebido->dados))->codIBGE,
+        ((cidade*)(recebido->dados))->nome,
+        ((cidade*)(recebido->dados))->uf,
+        ((cidade*)(recebido->dados))->capital,
         recebido->x,
         recebido->y,
-        ((data*)(recebido->dados))->siafi,
-        ((data*)(recebido->dados))->ddd,
-        ((data*)(recebido->dados))->fuso);
+        ((cidade*)(recebido->dados))->siafi,
+        ((cidade*)(recebido->dados))->ddd,
+        ((cidade*)(recebido->dados))->fuso);
     }
 }
 

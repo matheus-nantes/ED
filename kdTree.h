@@ -4,7 +4,7 @@
 #define MAXCHAR 100
 
 
-typedef struct data{
+typedef struct cidade{
     int codIBGE;
     char nome[MAXCHAR];
     int capital;
@@ -12,7 +12,7 @@ typedef struct data{
     int siafi;
     int ddd;
     char fuso[100];
-}data;
+}cidade;
 
 typedef struct fastFood{
     int id;
@@ -27,8 +27,8 @@ typedef struct fastFood{
 } fastFood;
 
 typedef struct _node{
-    float x;
-    float y;
+    float x;//latitude
+    float y;//longitude
     struct _node * pai;
     struct _node * esq;
     struct _node * dir;
@@ -36,11 +36,6 @@ typedef struct _node{
 }no;
 
 
-typedef struct _coord{
-    double x;
-    double y;
-    struct _coord * prox;
-}coordenadas;
 
 void montarLista(no ** raiz,char nomeArq[30]);
 

@@ -190,7 +190,7 @@
 189,16311 State Route 267,Fast Food Restaurants,East Liverpool,US,40.66428,-80.62041,Italo's Pizza,43920,OH,http://www.italospizza.com
 190,900 W 8th St,Ice Cream Shop and Fast Food Restaurant,East Liverpool,US,40.62539,-80.59109,Dairy Queen,43920,OH,"http://www.dairyqueen.com,http://dairyqueen.com"
 191,723 Saratoga Ave,Fast Food Restaurants,Lima,US,40.73101,-84.07296,Hunan Gardens,45804,OH,http://www.limahunangardens.com/location.html
-192,23777 Us Route 23,Fast Food Restaurant,Circleville,US,39.58426871,-82.95390414,Burger King,43113,OH,"http://bk.com,http://www.bk.com"
+192,23777 Us Route 23,Fast Food Restaurant,Circleville",US,39.58426871,-82.95390414,Burger King,43113,OH,"http://bk.com,http://www.bk.com"
 193,414 Water St,Fast food restaurants,Chardon,US,41.580901,-81.210168,Burger King,44024,OH,"https://locations.bk.com/oh/chardon/414-water-st.html,http://www.bk.com"
 194,2005 S Main St,Fast Food Restaurant,Bellefontaine,US,40.331939,-83.761451,Burger King,43311,OH,"http://www.bk.com,https://locations.bk.com/oh/bellefontaine/2005-s-main-st.html"
 195,2000 E Edgerton Rd,Fast Food Restaurants,Broadview Heights,US,41.29553,-81.67674,Burger King,44147,OH,https://locations.bk.com/oh/broadview-heights/2000-edgerton-rd.html

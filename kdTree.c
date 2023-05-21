@@ -181,15 +181,15 @@ void troca(no * x, no * y){
    no * aux = calloc(1, sizeof(no));//troca apenas dos valores dos nós
    aux->x = x->x;
    aux->y = x->y;
-   aux->dados = (data*)x->dados;
+   aux->dados = (cidade*)x->dados;
 
    x->x = y->x;
    x->y = y->y;
-   x->dados = (data*)y->dados;
+   x->dados = (cidade*)y->dados;
 
    y->x = aux->x;
    y->y = aux->y;
-   y->dados = (data*)aux->dados;
+   y->dados = (cidade*)aux->dados;
 
     free(aux);
 }
