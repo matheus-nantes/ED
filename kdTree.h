@@ -62,6 +62,8 @@ no * buscaNO(no * raiz, float lat, float lon, char param);
 
 float calculaDistancia(no * a, no * b);
 
+no * cincoProx(no * recebido);
+
 void destruir(no * raiz);
 
 

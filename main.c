@@ -58,26 +58,26 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
             printf("\nprovinicia: %s,",fastfood->province);
             printf("\nsite: %s\n",fastfood->websites);
             cont ++;
-            // aux = criarNO(fastfood);
-            // aux->x = auxX; 
-            // aux->y = auxY;
+            aux = criarNO(fastfood);
+            aux->x = auxX; 
+            aux->y = auxY;
             
-    //         if(*indice == NULL){
-    //             *indice = aux;
-    //             aux -> pai = NULL;
-    //         }
-    //         else{
-    //             p = *indice;
-    //             while(p->dir != NULL){//procura a "ultima" posicao da lista
-    //                 p = p->dir;
-    //             }
-    //             p->dir = aux;
-    //             aux->pai = p;
+            if(*indice == NULL){
+                *indice = aux;
+                aux -> pai = NULL;
             }
-    //         fastfood = (fastFood *)malloc(sizeof(fastFood));
+            else{
+                p = *indice;
+                while(p->dir != NULL){//procura a "ultima" posicao da lista
+                    p = p->dir;
+                }
+                p->dir = aux;
+                aux->pai = p;
+            }
+            fastfood = (fastFood *)malloc(sizeof(fastFood));
             }
 
-    // }
+    }
     
     fclose(arq);
 }
@@ -96,7 +96,7 @@ void print(no* recebido, char tipo){
         ((fastFood*)(recebido->dados))->province,
         ((fastFood*)(recebido->dados))->websites);
     }
-    else{//se os dados forem de um a cidade
+    else{//se os dados forem de uma cidade
         printf("\n--------------------\nCodigo IBGE: %d\nNome do municipio: %s\nCodigo UF: %d\nCapital: %d\nLatitude: %f\nLongitude: %f\nCodigo SIAFI: %d\nDDD: %d\nFuso Horario: %s\n--------------------\n",
         ((data*)(recebido->dados))->codIBGE,
         ((data*)(recebido->dados))->nome,
@@ -115,6 +115,7 @@ int main(){
 
     no * indiceLista = NULL;
     char nomeArq[MAXCHAR];
+    float lat, lon;
     printf("\nInforme o nome do arquivo que estao os dados: ");
     scanf("%s",nomeArq);
     montarLista(&indiceLista,nomeArq);
@@ -131,13 +132,14 @@ int main(){
         switch(input){
             case 1:
                 printf("\nInformar as coordenadas, no formato 'latitude longitude'\n");
-                float lat, lon;
                 scanf("%f %f",&lat,&lon);
                 no * encontrado = encontrarMaisProximo(raiz,lat,lon);
                 print(encontrado,'c');
                 break;
             case 2:
-                printf("Informar as coordenadas, no formato 'latitude longitude'");
+                printf("Informar as coordenadas, no formato 'latitude longitude'\n");
+                scanf("%f %f",&lat,&lon);
+                no * aux = cincoProx(buscaNO(raiz,lat,lon,'x'));
                 break;
             case 3:
                 destruir(raiz);

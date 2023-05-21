@@ -12,8 +12,7 @@ no * criarNO(void *  dados){
     return aux;
 }
 
-//inserirNO(raiz,aux,'x');//começa no x pois o compara com o primeiro nó ( "nível x"), e depois vai intercalando entre x e y ao passar de nivel.     
-void inserirNO(no ** raiz, no * recebido, char param){
+void inserirNO(no ** raiz, no * recebido, char param){//x é longitude, e y é latitude
     if(*raiz == NULL){
         *raiz = recebido;
     }
@@ -62,7 +61,7 @@ void inserirNO(no ** raiz, no * recebido, char param){
     }
 }
 
-void montarKD(no **raiz, no ** indice){
+void montarKD(no **raiz, no ** indice){//índice é a primeira posicao da lista
     no * p = *indice;
     while(p->dir != NULL){//acha o fim da lista
         p=p->dir;
@@ -301,6 +300,86 @@ no * buscaNO(no * raiz, float lat, float lon, char param){//se o nó existir, re
         }
     }
 
+}
+
+no * cincoProx(no * recebido){
+    no * lista = calloc(5,sizeof(no));
+    no * p = recebido;
+    int cont = 0;
+    if(recebido->esq !=NULL){
+        if(recebido->esq->dir!=NULL){
+            while(p->dir != NULL){
+                p=p->dir;
+            }
+            //p chegou no ultimo antecessor
+            while(p->pai != recebido && cont < 2){
+                lista[cont] = *p;
+                cont ++;
+                p=p->pai;
+            }
+        }
+        else{
+            lista[cont] = *(recebido->esq);
+        }
+    }
+    if(recebido->dir !=NULL){
+        if(recebido->dir->esq!=NULL){
+            while(p->esq != NULL){
+                p=p->esq;
+            }
+            //p chegou no ultimo antecessor
+            while(p->pai != recebido && cont < 5){
+                lista[cont] = *p;
+                cont ++;
+                p=p->pai;
+            }
+        }
+        else{
+            lista[cont] = *(recebido->dir);
+        }
+    }
+    if(recebido->esq == NULL && recebido->dir == NULL){
+        if(recebido->pai->dir == recebido && cont < 5){
+            lista[cont]=*(recebido->pai);
+            cont++;
+
+            p=recebido->pai->esq;
+            if(p->esq != NULL && cont < 5){
+                lista[cont]=*(p->esq);
+                cont++;
+                if(p->esq->esq != NULL && cont < 5){
+                    lista[cont]=*(p->esq->esq);
+                    cont++;
+                }
+                if(p->esq->dir != NULL && cont < 5){
+                    lista[cont]=*(p->esq->dir);
+                    cont++;
+                }
+            }
+            if(p->dir != NULL && cont < 5){
+                lista[cont]=*(p->dir);
+                cont++;
+                if(p->dir->dir != NULL && cont < 5){
+                    lista[cont]=*(p->dir->dir);
+                    cont++;
+                }
+                if(p->dir->esq != NULL && cont < 5){
+                    lista[cont]=*(p->dir->esq);
+                    cont++;
+                }
+            }
+            if(cont  < 5){
+                p = recebido;
+                while(p->pai != NULL && cont < 5){
+                    lista[cont] = *(p->pai);
+                    p=p->pai;
+                    cont++;
+                }
+            }
+
+        }
+    }
+    return lista;
 }
 
 void destruir(no * raiz){
