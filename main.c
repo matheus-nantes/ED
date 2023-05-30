@@ -140,6 +140,11 @@ int main(){
                 printf("Informar as coordenadas, no formato 'latitude longitude'\n");
                 scanf("%f %f",&lat,&lon);
                 no * aux = cincoProx(buscaNO(raiz,lat,lon,'x'));
+                printf("\n%f %f",aux[0].x,aux[0].y);
+                printf("\n%f %f",aux[1].x,aux[1].y);
+                printf("\n%f %f",aux[2].x,aux[2].y);
+                printf("\n%f %f",aux[3].x,aux[3].y);
+                printf("\n%f %f",aux[4].x,aux[4].y);
                 break;
             case 3:
                 destruir(raiz);
