@@ -3,6 +3,107 @@
 #include<string.h>
 #include "kdTree.h"
 
+typedef struct cidade{
+    int codIBGE;
+    float latitude;
+    float longitude;
+    char nome[MAXCHAR];
+    int capital;
+    int uf;
+    int siafi;
+    int ddd;
+    char fuso[100];
+}cidade;
+
+int compara_cidade(const void *a, const void *b, char param){
+    cidade * a1;
+    cidade * a2;
+    a1 = (cidade *) a;
+    a2 = (cidade *) b;
+    int result = 0;
+    if(param='x'){//se for latitude
+        result = a1->latitude - a2->latitude;
+    }
+    else{
+        result = a1->longitude - a2->longitude;
+    }
+    if(result < 0){//se for menor, retorna 1
+        return 1;
+    }
+    else{//senão retorna 0
+        return 0;
+    }
+}
+
+double distancia_cidade(const void *a, const void *b, char param){
+    cidade * a1;
+    cidade * a2;
+    a1 = (cidade *) a;
+    a2 = (cidade *) b;
+    int result = 0;
+    if(param='x'){//se for latitude
+        result = a1->latitude - a2->latitude;
+    }
+    else{
+        result = a1->longitude - a2->longitude;
+    }
+    return result;
+}
+
+
+typedef struct fastFood{
+    int id;
+    float latitude;
+    float longitude;
+    char address[MAXCHAR];
+    char categories[MAXCHAR];
+    char city[MAXCHAR];
+    char country[MAXCHAR];
+    char name[MAXCHAR];
+    int postalCode;
+    char province[MAXCHAR];
+    char websites[2000];
+} fastFood;
+
+int compara_fastfood(const void *a, const void * b, char param){
+    fastFood * a1;
+    fastFood * a2;
+    a1 = (fastFood *) a;
+    a2 = (fastFood *) b;
+    int result = 0;
+    if(param='x'){//se for latitude
+        result = a1->latitude - a2->latitude;
+    }
+    else{
+        result = a1->longitude - a2->longitude;
+    }
+    if(result < 0){//se for menor, retorna 1
+        return 1;
+    }
+    else if(result == 0){//se for igual retorna 0
+        return -1;
+    }
+    else{//se for maior retorna 0
+        return 0;
+    }
+}
+
+double distancia_fastfood(const void *a, const void *b, char param){
+    fastFood * a1;
+    fastFood * a2;
+    a1 = (fastFood *) a;
+    a2 = (fastFood *) b;
+    int result = 0;
+    if(param='x'){//se for latitude
+        result = a1->latitude - a2->latitude;
+    }
+    else{
+        result = a1->longitude - a2->longitude;
+    }
+    return result;
+}
+
+
 void montarLista(no ** indice,char nomeArq[MAXCHAR]){
     no * aux;
     no * p = NULL;
@@ -19,12 +120,10 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
     }
     if(strcmp(nomeArq,"municipios.txt")==0){
         cidade * cidad = (cidade*) malloc(sizeof(cidade));
-        while (fscanf(arq, "%d,%[^,],%f,%f,%d,%d,%d,%d,%s\n",&(cidad->codIBGE),&(cidad->nome), &auxX,&auxY, &(cidad->capital), &(cidad->uf),&(cidad->siafi),&(cidad->ddd),&(cidad->fuso)) !=EOF)
+        while (fscanf(arq, "%d,%[^,],%f,%f,%d,%d,%d,%d,%s\n",&(cidad->codIBGE),&(cidad->nome), &(cidad->latitude),&(cidad->longitude), &(cidad->capital), &(cidad->uf),&(cidad->siafi),&(cidad->ddd),&(cidad->fuso)) !=EOF)
         {   
             cont ++;
-            aux = criarNO(cidad);
-            aux->x = auxX; 
-            aux->y = auxY;
+            aux = criarNO(cidad, compara_cidade);
             
             if(*indice == NULL){
                 *indice = aux;
@@ -44,23 +143,21 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
     else if(strcmp(nomeArq,"fastFood.txt")==0){
         fastFood * fastfood = (fastFood*) malloc(sizeof(fastFood));
  
-        while (fscanf(arq, "%d,%[^,],%[^,],%[^,],%[^,],%f,%f,%[^,],%d,%[^,],%[^\n]\n",&(fastfood->id),&(fastfood->address),&(fastfood->categories),&(fastfood->city),&(fastfood->country),&auxX,&auxY,&(fastfood->name),&(fastfood->postalCode),&(fastfood->province),&(fastfood->websites))!=EOF)
+        while (fscanf(arq, "%d,%[^,],%[^,],%[^,],%[^,],%f,%f,%[^,],%d,%[^,],%[^\n]\n",&(fastfood->id),&(fastfood->address),&(fastfood->categories),&(fastfood->city),&(fastfood->country),&(fastfood->latitude),&(fastfood->longitude),&(fastfood->name),&(fastfood->postalCode),&(fastfood->province),&(fastfood->websites))!=EOF)
         {
             printf("\n\n id: %d,",fastfood->id);
             printf("\nendereco: %s,",fastfood->address);
             printf("\ncategoria: %s,",fastfood->categories);
             printf("\ncidade: %s,",fastfood->city);
             printf("\npais: %s,",fastfood->country);
-            printf("\nx: %f,",auxX);
-            printf("\ny: %f,",auxY);
+            printf("\nx: %f,",fastfood->latitude);
+            printf("\ny: %f,",fastfood->longitude);
             printf("\nnome: !%s!,",fastfood->name);
             printf("\npostal: -%d-,",fastfood->postalCode);
             printf("\nprovinicia: %s,",fastfood->province);
             printf("\nsite: %s\n",fastfood->websites);
             cont ++;
-            aux = criarNO(fastfood);
-            aux->x = auxX; 
-            aux->y = auxY;
+            aux = criarNO(fastfood, compara_fastfood);
             
             if(*indice == NULL){
                 *indice = aux;
@@ -89,8 +186,8 @@ void print(no* recebido, char tipo){
         ((fastFood*)(recebido->dados))->categories,
         ((fastFood*)(recebido->dados))->city,
         ((fastFood*)(recebido->dados))->country,
-        recebido->x,
-        recebido->y,
+        ((fastFood*)(recebido->dados))->latitude,
+        ((fastFood*)(recebido->dados))->longitude,
         ((fastFood*)(recebido->dados))->name,
         ((fastFood*)(recebido->dados))->postalCode,
         ((fastFood*)(recebido->dados))->province,
@@ -102,8 +199,8 @@ void print(no* recebido, char tipo){
         ((cidade*)(recebido->dados))->nome,
         ((cidade*)(recebido->dados))->uf,
         ((cidade*)(recebido->dados))->capital,
-        recebido->x,
-        recebido->y,
+        ((cidade*)(recebido->dados))->latitude,
+        ((cidade*)(recebido->dados))->longitude,
         ((cidade*)(recebido->dados))->siafi,
         ((cidade*)(recebido->dados))->ddd,
         ((cidade*)(recebido->dados))->fuso);
@@ -120,6 +217,9 @@ int main(){
     scanf("%s",nomeArq);
     montarLista(&indiceLista,nomeArq);
 
+    cidade * temp = (cidade*) malloc(sizeof(cidade));
+
+    no * aux = NULL;
     no * raiz = NULL;
     montarKD(&raiz, &indiceLista);
 
@@ -132,19 +232,16 @@ int main(){
         switch(input){
             case 1:
                 printf("\nInformar as coordenadas, no formato 'latitude longitude'\n");
-                scanf("%f %f",&lat,&lon);
-                no * encontrado = encontrarMaisProximo(raiz,lat,lon);
+                scanf("%f %f",&temp->latitude,&temp->longitude);
+                aux = criarNO(temp, compara_cidade);
+                no * encontrado = encontrarMaisProximo(raiz,aux,distancia_cidade);
                 print(encontrado,'c');
                 break;
             case 2:
                 printf("Informar as coordenadas, no formato 'latitude longitude'\n");
-                scanf("%f %f",&lat,&lon);
-                no * aux = cincoProx(buscaNO(raiz,lat,lon,'x'));
-                printf("\n%f %f",aux[0].x,aux[0].y);
-                printf("\n%f %f",aux[1].x,aux[1].y);
-                printf("\n%f %f",aux[2].x,aux[2].y);
-                printf("\n%f %f",aux[3].x,aux[3].y);
-                printf("\n%f %f",aux[4].x,aux[4].y);
+                scanf("%f %f",&temp->latitude,&temp->longitude);
+                aux = criarNO(temp, compara_cidade);
+                no* listaprox = cincoProx(buscaNO(raiz,aux,'x'), distancia_fastfood);
                 break;
             case 3:
                 destruir(raiz);

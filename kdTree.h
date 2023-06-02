@@ -4,42 +4,19 @@
 #define MAXCHAR 100
 
 
-typedef struct cidade{
-    int codIBGE;
-    char nome[MAXCHAR];
-    int capital;
-    int uf;
-    int siafi;
-    int ddd;
-    char fuso[100];
-}cidade;
-
-typedef struct fastFood{
-    int id;
-    char address[MAXCHAR];
-    char categories[MAXCHAR];
-    char city[MAXCHAR];
-    char country[MAXCHAR];
-    char name[MAXCHAR];
-    int postalCode;
-    char province[MAXCHAR];
-    char websites[2000];
-} fastFood;
-
 typedef struct _node{
-    float x;//latitude
-    float y;//longitude
     struct _node * pai;
     struct _node * esq;
     struct _node * dir;
     void * dados;
+    int (* compara)(const void *a, const void *b, char param);
 }no;
 
 
 
 void montarLista(no ** raiz,char nomeArq[30]);
 
-no * criarNO(void *  dados);
+no * criarNO(void *  dados, int (* compara)(const void * a, const void * b, char param));
 
 void inserirNO(no ** raiz, no * recebido, char param);
 
@@ -51,13 +28,11 @@ int insertionSort(no**indice, no * atual, no * fim, char parametro);
 
 void troca(no * x, no * y);
 
-no * encontrarMaisProximo(no * raiz, float lat, float lon);
+no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const void * a, const void * b, char param));
 
-no * buscaNO(no * raiz, float lat, float lon, char param);
+no * buscaNO(no * raiz, no * recebido, char param);
 
-float calculaDistancia(no * a, no * b);
-
-no * cincoProx(no * recebido);
+no * cincoProx(no * recebido,  double (*distancia)(const void * a, const void * b, char param));
 
 void destruir(no * raiz);
 
