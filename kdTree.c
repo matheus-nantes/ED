@@ -9,17 +9,18 @@ no * criarNO(void *  dados, int (* compara)(const void * a, const void * b, char
     aux->dir =NULL;
     aux->esq =NULL;
     aux->pai = NULL;
-    aux->compara = (void *) compara;
+    aux->compara =  compara;
     return aux;
 }
 
 void inserirNO(no ** raiz, no * recebido, char param){//x é longitude, e y é latitude
+    
     if(*raiz == NULL){
         *raiz = recebido;
     }
     else{
         if(param == 'x'){
-            if(recebido->compara(*raiz,recebido,'x')){//o novo nó é menor em latitude
+            if(recebido->compara(*raiz,recebido,param)){//o novo nó é menor em latitude
                 if((*raiz)->esq == NULL){//se não houver filho a esquerda, enserimos lá
                     (*raiz)->esq = recebido;
                     recebido->pai = *raiz;
@@ -40,7 +41,7 @@ void inserirNO(no ** raiz, no * recebido, char param){//x é longitude, e y é l
             }
         }
         else{//parametro é y
-            if((*raiz)->compara(*raiz, recebido,'y') == 1){//o novo nó é menor em longitude
+            if((*raiz)->compara(*raiz, recebido,param) == 1){//o novo nó é menor em longitude
                 if((*raiz)->esq == NULL){//se não houver filho a esquerda, enserimos lá
                     (*raiz)->esq = recebido;
                     recebido->pai = *raiz;
@@ -84,29 +85,20 @@ void construirKD(no ** raiz, no ** indice, no * inicio, no * fim, char parametro
         fim->pai = NULL;//zera os campos de referencia dos nózes a ser inserido
         fim->dir = NULL;
         fim->esq = NULL;
-        if(parametro=='x'){
-            if(inicio->compara(inicio,fim,'x')==1){//comparo os dois únicos nós da sublista, e insiro o menor, depois o maior
-                
-                inserirNO(raiz,inicio,'x');
-                inserirNO(raiz,fim,'x');
-            }
-            else{
-                inserirNO(raiz,fim,'x');
-                inserirNO(raiz,inicio,'x');
-            }
+
+        if(inicio->compara(inicio,fim,parametro)==1){//comparo os dois únicos nós da sublista, e insiro o menor, depois o maior
+            inserirNO(raiz,inicio,'x');
+            inserirNO(raiz,fim,'x');
         }
         else{
-            if(inicio->compara(inicio,fim,'y')==1){
-                inserirNO(raiz,inicio,'x');
-                inserirNO(raiz,fim,'x');
-            }
-            else{
-                inserirNO(raiz,fim,'x');
-                inserirNO(raiz,inicio,'x');
-            }
+            inserirNO(raiz,fim,'x');
+            inserirNO(raiz,inicio,'x');
         }
-    }
+    }       
     else if(inicio == fim){
+        inicio->pai = NULL;
+        inicio->dir = NULL;
+        inicio->esq = NULL;
         inserirNO(raiz,inicio,'x');//insiro o único nó restante na sublista
     }
     else{//se há mais de um valor na metade recebida, devemos achar a mediana
@@ -138,7 +130,6 @@ void construirKD(no ** raiz, no ** indice, no * inicio, no * fim, char parametro
         }
         else{
             construirKD(raiz, indice, inicio,fimProx,'x');//organiza a metade a esquerda em x
-            
             construirKD(raiz,indice,inicioProx,fim,'x');//organiza a metade a direita em x
         }
     }
@@ -154,15 +145,8 @@ int insertionSort(no**indice, no * atual, no * fim, char parametro){
         p = atual->dir;
         if(fim != NULL){
             while(p != fim->dir){
-                if(parametro == 'x'){
-                    if(p->compara(p,menor,'x')==1){
-                        menor = p;
-                    }
-                }
-                else{
-                    if(p->compara(p,menor,'y')==1){
-                        menor = p;
-                    }
+                if(p->compara(p,menor,parametro)==1){
+                    menor = p; 
                 }
                 p = p->dir;
             }
@@ -184,8 +168,6 @@ void troca(no * x, no * y){
    x->dados = y->dados;
 
    y->dados = aux->dados;
-
-    free(aux);
 }
 
 
@@ -198,7 +180,7 @@ no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const v
     no * suc = NULL;
     no * p = NULL; 
     //se o nó não existir, significa que o nó que foi retornado é o seu "pai",caso os valores estivessem na arvore
-    if(encontrado->compara(encontrado,recebido,'x') == -1 && encontrado->compara(encontrado, recebido, 'y')== -1){
+    if(encontrado->compara(encontrado,recebido,'x') != -1 && encontrado->compara(encontrado, recebido, 'y') != -1){
         return encontrado;
     }
     else{//se o nó existir na árvore, e devemos verificar dentre o antecessor ou o sucessor, qual é o mais proximo
