@@ -28,11 +28,15 @@ int insertionSort(no**indice, no * atual, no * fim, char parametro);
 
 void troca(no * x, no * y);
 
+no * predecessor(no * recebido);
+
+no * sucessor(no * recebido);
+
 no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const void * a, const void * b, char param));
 
 no * buscaNO(no * raiz, no * recebido, char param);
 
-no * cincoProx(no * recebido,  double (*distancia)(const void * a, const void * b, char param));
+no ** cincoProx(int k, no * recebido,  double (*distancia)(const void * a, const void * b, char param));
 
 void destruir(no * raiz);
 

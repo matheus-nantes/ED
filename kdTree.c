@@ -15,19 +15,21 @@ no * criarNO(void *  dados, int (* compara)(const void * a, const void * b, char
 
 void inserirNO(no ** raiz, no * recebido, char param){//x é longitude, e y é latitude
     
+    recebido->esq = NULL;
+    recebido->dir = NULL;
     if(*raiz == NULL){
+        printf("\nPrimeiro");
         *raiz = recebido;
     }
     else{
         if(param == 'x'){
-            if(recebido->compara(*raiz,recebido,param)){//o novo nó é menor em latitude
+            if(recebido->compara((*raiz)->dados,recebido->dados,param) == 1){//o novo nó é maior em latitude
                 if((*raiz)->esq == NULL){//se não houver filho a esquerda, enserimos lá
                     (*raiz)->esq = recebido;
                     recebido->pai = *raiz;
                 }
                 else{//se houver filho a esquerda, verificamos onde deve ser inserido
                     inserirNO(&((*raiz)->esq), recebido, 'y');//invertendo o parametro, de x para y
-
                 }
             }
             else{//o novo nó é maior ou igual á raiz
@@ -41,7 +43,7 @@ void inserirNO(no ** raiz, no * recebido, char param){//x é longitude, e y é l
             }
         }
         else{//parametro é y
-            if((*raiz)->compara(*raiz, recebido,param) == 1){//o novo nó é menor em longitude
+            if((*raiz)->compara((*raiz)->dados, recebido->dados,param) == 1){//o novo nó é menor em longitude
                 if((*raiz)->esq == NULL){//se não houver filho a esquerda, enserimos lá
                     (*raiz)->esq = recebido;
                     recebido->pai = *raiz;
@@ -86,19 +88,17 @@ void construirKD(no ** raiz, no ** indice, no * inicio, no * fim, char parametro
         fim->dir = NULL;
         fim->esq = NULL;
 
-        if(inicio->compara(inicio,fim,parametro)==1){//comparo os dois únicos nós da sublista, e insiro o menor, depois o maior
-            inserirNO(raiz,inicio,'x');
+        if(inicio->compara(inicio->dados,fim->dados,parametro)==1){//comparo os dois únicos nós da sublista, e insiro o menor, depois o maior
+            //se "fim" for menor, insiro ele primeiro
             inserirNO(raiz,fim,'x');
+            inserirNO(raiz,inicio,'x');
         }
-        else{
-            inserirNO(raiz,fim,'x');
+        else{//senão, insiro "inicio" e depois "fim"
             inserirNO(raiz,inicio,'x');
+            inserirNO(raiz,fim,'x');
         }
     }       
     else if(inicio == fim){
-        inicio->pai = NULL;
-        inicio->dir = NULL;
-        inicio->esq = NULL;
         inserirNO(raiz,inicio,'x');//insiro o único nó restante na sublista
     }
     else{//se há mais de um valor na metade recebida, devemos achar a mediana
@@ -145,8 +145,8 @@ int insertionSort(no**indice, no * atual, no * fim, char parametro){
         p = atual->dir;
         if(fim != NULL){
             while(p != fim->dir){
-                if(p->compara(p,menor,parametro)==1){
-                    menor = p; 
+                if(p->compara(menor->dados, p->dados,parametro)==1){//se p->dados for menor que menor->dados...
+                    menor = p; //...atualizamos o menor
                 }
                 p = p->dir;
             }
@@ -170,6 +170,25 @@ void troca(no * x, no * y){
    y->dados = aux->dados;
 }
 
+no * predecessor(no * recebido){
+    no * p = recebido->esq;//vai pro filho a esquerda
+    if(p != NULL){//se houver filho a esquerda
+        while(p->dir != NULL){//enquanto houver filho a direita
+            p=p->dir;//percorre até achar o predecessor (preciso verificar no retrno se não é nulo)
+        }
+    }
+    return p;//retorna o predecessor
+}
+
+no * sucessor(no * recebido){
+    no * p = recebido->dir;//vai pro filho a direita
+    if(p != NULL){//se houver filho a direita
+        while(p->esq != NULL){//enquanto houver filho a esquerda
+            p=p->esq;//percorre até achar o sucessor
+        }
+    }
+    return p;//retorna o predecessor (preciso verificar no retrno se não é nulo)
+}
 
 
 no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const void * a, const void * b, char param)){
@@ -180,25 +199,15 @@ no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const v
     no * suc = NULL;
     no * p = NULL; 
     //se o nó não existir, significa que o nó que foi retornado é o seu "pai",caso os valores estivessem na arvore
-    if(encontrado->compara(encontrado,recebido,'x') != -1 && encontrado->compara(encontrado, recebido, 'y') != -1){
+    if(encontrado->compara(encontrado->dados,recebido->dados,'x') != -1 && encontrado->compara(encontrado->dados, recebido->dados, 'y') != -1){//se todos os campos do "encotrado", que é o nó que a função busca nó retornou for diferente do "recebido", significa que foi retornado o pai se um nó com tais valores existisse na estrutura, ou seja, o nó mais próximo é seu pai
         return encontrado;
     }
     else{//se o nó existir na árvore, e devemos verificar dentre o antecessor ou o sucessor, qual é o mais proximo
     //pegar os dois nós mais próximos
-        if(encontrado->esq != NULL){//o nó possui filho a esquerda
-            p = encontrado->esq;
-            while(p->dir!=NULL){//procuramos o predecessor
-                p = p->dir;
-            }
-            pred = p;
-        }
-        if(encontrado->dir != NULL){//o nó possui filho a direita
-            p = encontrado->dir;
-            while(p->esq != NULL){//procuramos o sucessor
-                p = p->esq;
-            }
-            suc = p;
-        }
+        pred = predecessor(encontrado);
+       
+        suc = sucessor(encontrado);
+
         if(pred == NULL && suc == NULL){//se o nó não possui nem predecessor, nem sucessor, retornamos o pai
             return encontrado->pai;
         }
@@ -209,11 +218,20 @@ no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const v
             return pred;
         }
         else{//descobrir qual é o menor
-            float disPred, disSuc;
-            disPred = (distancia(encontrado,pred,'x') * distancia(encontrado,pred,'x'))+(distancia(encontrado,pred,'y')*distancia(encontrado,pred,'y'));//raiz (cateto x*x + cateto y*y)
-            disSuc = (distancia(encontrado,suc,'x') * distancia(encontrado,suc,'x'))+(distancia(encontrado,suc,'y')*distancia(encontrado,suc,'y'));//raiz (cateto x*x + cateto y*y)
+            double disPred,disPredX, disPredY, disSuc, disSucX, disSucY;
+
+            disPredX = distancia(encontrado->dados, pred->dados,'x');
+            disPredY = distancia(encontrado->dados, pred->dados,'y'); 
+            
+            disSucX = distancia(encontrado->dados, suc->dados,'x');
+            disSucY = distancia(encontrado->dados, suc->dados,'y');
+            
+            disPred = (disPredX*disPredX)+(disPredY*disPredY);//a^2 + b^2
+            disSuc = (disSucX*disSucX)+(disSucY*disSucY);//a^2 + b^2
+
             disPred = sqrt(disPred);
             disSuc = sqrt(disSuc);
+
             if(disPred < disSuc){
                 return pred;
             }
@@ -229,12 +247,12 @@ no * buscaNO(no * raiz, no * recebido, char param){//se o nó existir, retorna e
     if(raiz == NULL){
         printf("Não há dados na estrutura");
     }
-    else if(raiz->compara(raiz,recebido,'x') == -1 && raiz->compara(raiz,recebido,'y') == 0){
+    else if(raiz->compara(raiz->dados,recebido->dados,'x') == -1 && raiz->compara(raiz->dados,recebido->dados,'y') == -1){//se o nó existe na arvore, ou seja, se os valores recebidos estão em algum nó na estrutura
         return raiz;
     }
     else{
         if(param == 'x'){
-            if(raiz->compara(raiz, recebido, 'x') == 1){//o novo nó é menor
+            if(raiz->compara(raiz->dados, recebido->dados, 'x') == 1){//o novo nó é menor
                 if(raiz->esq == NULL){//se não houver filho a esquerda, enserimos lá
                     return raiz;
                 }
@@ -252,7 +270,7 @@ no * buscaNO(no * raiz, no * recebido, char param){//se o nó existir, retorna e
             }
         }
         else{//parametro é y
-            if(raiz->compara(raiz, recebido,'y') == 1){//o novo nó é menor em y
+            if(raiz->compara(raiz->dados, recebido->dados,'y') == 1){//o novo nó é menor em y
                 if(raiz->esq == NULL){//se não houver filho a esquerda, enserimos lá
                     return raiz;
                 }
@@ -274,83 +292,36 @@ no * buscaNO(no * raiz, no * recebido, char param){//se o nó existir, retorna e
 
 }
 
-no * cincoProx(no * recebido,  double (* distancia)(const void * a, const void * b, char param)){
-    no * lista = calloc(5,sizeof(no));
-    // no * p = recebido;
-    // int cont = 0;
-    // if(recebido->esq !=NULL){
-    //     if(recebido->esq->dir!=NULL){
-    //         while(p->dir != NULL){
-    //             p=p->dir;
-    //         }
-    //         //p chegou no ultimo antecessor
-    //         while(p->pai != recebido && cont < 2){
-    //             lista[cont] = *p;
-    //             cont ++;
-    //             p=p->pai;
-    //         }
-    //     }
-    //     else{
-    //         lista[cont] = *(recebido->esq);
-    //     }
-    // }
-    // if(recebido->dir !=NULL){
-    //     if(recebido->dir->esq!=NULL){
-    //         while(p->esq != NULL){
-    //             p=p->esq;
-    //         }
-    //         //p chegou no ultimo antecessor
-    //         while(p->pai != recebido && cont < 5){
-    //             lista[cont] = *p;
-    //             cont ++;
-    //             p=p->pai;
-    //         }
-    //     }
-    //     else{
-    //         lista[cont] = *(recebido->dir);
-    //     }
-    // }
-    // if(recebido->esq == NULL && recebido->dir == NULL){
-    //     if(recebido->pai->dir == recebido && cont < 5){
-    //         lista[cont]=*(recebido->pai);
-    //         cont++;
+no ** cincoProx(int k, no * recebido,  double (* distancia)(const void * a, const void * b, char param)){
+    no ** lista =  (no**) calloc(k,sizeof(no*));
+    no* pred = predecessor(recebido);
+    no * suc = sucessor(recebido);
+    no * pai = NULL;
+    int cont = 0, contp = 0, conts = 0, metade = k/2, controle = 0;
 
-    //         p=recebido->pai->esq;
-    //         if(p->esq != NULL && cont < 5){
-    //             lista[cont]=*(p->esq);
-    //             cont++;
-    //             if(p->esq->esq != NULL && cont < 5){
-    //                 lista[cont]=*(p->esq->esq);
-    //                 cont++;
-    //             }
-    //             if(p->esq->dir != NULL && cont < 5){
-    //                 lista[cont]=*(p->esq->dir);
-    //                 cont++;
-    //             }
-    //         }
-    //         if(p->dir != NULL && cont < 5){
-    //             lista[cont]=*(p->dir);
-    //             cont++;
-    //             if(p->dir->dir != NULL && cont < 5){
-    //                 lista[cont]=*(p->dir->dir);
-    //                 cont++;
-    //             }
-    //             if(p->dir->esq != NULL && cont < 5){
-    //                 lista[cont]=*(p->dir->esq);
-    //                 cont++;
-    //             }
-    //         }
-    //         if(cont  < 5){
-    //             p = recebido;
-    //             while(p->pai != NULL && cont < 5){
-    //                 lista[cont] = *(p->pai);
-    //                 p=p->pai;
-    //                 cont++;
-    //             }
-    //         }
+    while(cont < k && controle < k){
+        if(contp <= metade){
+            if(pred != NULL){
+                lista[cont] = pred;
+                pred = predecessor(pred);
+                contp++;
+            }
+        }
+        if(conts < metade+1){
+            if(suc != NULL){
+                lista[cont] = pred;
+                suc = sucessor(pred);
+                conts++;
+            }
+        }
+        controle++;
+    }
 
-    //     }
-    // }
+    if(cont < k){
+        pai = recebido->pai;
+        lista[cont] = pai;
+        cont ++;
+    }
     return lista;
 }
 
