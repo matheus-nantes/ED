@@ -30,11 +30,11 @@ int compara_cidade(const void *a, const void *b, char param){
         result = (a1->longitude) - (a2->longitude);
         //printf("\nLON: %f - %f = %f = ",a1->longitude, a2->latitude, result);
     }
-    if(result < 0){//se a2 for maior a1, retorna 0
+    if(result < -0.1){//se a2 for maior a1, retorna 0
         //printf("0");
         return 0;
     }
-    else if(result == 0){//se for igual retorna -1
+    else if(result >= -0.1 && result <= 0.1){//se for igual(com  um margem de "aproximação" mais ou menos 0.001) retorna -1
         //printf("-1");
         return -1;
     }
@@ -85,10 +85,10 @@ int compara_fastfood(const void *a, const void * b, char param){
     else{
         result = a1->longitude - a2->longitude;
     }
-    if(result < 0){//se for menor, retorna 1
+    if(result < -0.1){//se for menor, retorna 1
         return 1;
     }
-    else if(result == 0){//se for igual retorna -1
+     else if(result >= -0.1 && result <= 0.1){//se for igual(com  um margem de "aproximação" mais ou menos 0.1) retorna -1
         return -1;
     }
     else{//se for maior retorna 0
@@ -201,7 +201,7 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
             fastfood = (fastFood *)malloc(sizeof(fastFood));
         }
     }
-    
+    printf("\nForam inseridos %d \"nozes\" na estrutura\n",cont);
     fclose(arq);
 }
 
@@ -219,6 +219,8 @@ int main(){
     fastFood * tempF = NULL;
 
     no * encontrado = NULL;
+
+    no** listaprox = NULL;
    
    if(strcmp(nomeArq,"municipios.txt")==0){
         tempC = (cidade*) malloc(sizeof(cidade));
@@ -232,9 +234,8 @@ int main(){
 
     montarKD(&raiz, &indiceLista);
 
-    printf("\nArvore construida");
+    printf("\nMedjiaiana: %d",((cidade*)raiz->dados)->codIBGE);
 
-    //assert(((cidade*)raiz->dados)->codIBGE == 5205059);
     int input = 0;
     while(input != -1){
         printf("\nEscollha um opcao:\n1-Mostrar mais proxima\n2-Mostrar as 5 mais proximas\n3-Encerrar\n");
@@ -261,18 +262,30 @@ int main(){
                 if(strcmp(nomeArq,"municipios.txt")==0){
                     scanf("%f %f",&(tempC->latitude),&(tempC->longitude));
                     aux = criarNO(tempC, compara_cidade);
+                    aux = buscaNO(raiz,aux,'x');
+                    listaprox = cincoProx(5, aux, distancia_cidade);//nesse caso k = 5, mas poderia ser qualquer valor
+                    printf("\nENCONTRADOS:\n===============");
+                    for(int i = 0; i < 5; i++){//nesse caso k = 5, mas poderia ser qualquer valor
+                        print(listaprox[i],'c');
+                    }
+                    printf("\n===============");
                 }
                 else{
                     scanf("%f %f",&(tempF->latitude),&(tempF->longitude));
                     aux = criarNO(tempF, compara_fastfood);
+                    aux = buscaNO(raiz,aux,'x');
 
+                    printf("\nProcurando os k nos mais proximos do seguinte no:\n!!!!!!!!!!");
+                    print(aux,'f');
+
+                    listaprox = cincoProx(5, aux, distancia_fastfood);//nesse caso k = 5, mas poderia ser qualquer valor
+                    
+                    printf("\nENCONTRADOS:===============");
+                    for(int i = 0; i < 5; i++){//nesse caso k = 5, mas poderia ser qualquer valor
+                        print(listaprox[i],'f');
+                        printf("\n===============");
+                    }
                 }
-                no** listaprox = cincoProx(5, buscaNO(raiz,aux,'x'), distancia_fastfood);
-                print(listaprox[0],'c');
-                print(listaprox[1],'c');
-                print(listaprox[2],'c');
-                print(listaprox[3],'c');
-                print(listaprox[4],'c');
                 break;
             case 3:
                 destruir(raiz);

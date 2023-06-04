@@ -18,7 +18,6 @@ void inserirNO(no ** raiz, no * recebido, char param){//x é longitude, e y é l
     recebido->esq = NULL;
     recebido->dir = NULL;
     if(*raiz == NULL){
-        printf("\nPrimeiro");
         *raiz = recebido;
     }
     else{
@@ -171,23 +170,29 @@ void troca(no * x, no * y){
 }
 
 no * predecessor(no * recebido){
-    no * p = recebido->esq;//vai pro filho a esquerda
-    if(p != NULL){//se houver filho a esquerda
+    if(recebido!=NULL && recebido->esq != NULL){
+        no * p = recebido->esq;//vai pro filho a esquerda
         while(p->dir != NULL){//enquanto houver filho a direita
             p=p->dir;//percorre até achar o predecessor (preciso verificar no retrno se não é nulo)
         }
+        return p;//retorna o predecessor
     }
-    return p;//retorna o predecessor
+    else{
+        return NULL;
+    }
 }
 
 no * sucessor(no * recebido){
-    no * p = recebido->dir;//vai pro filho a direita
-    if(p != NULL){//se houver filho a direita
+    if(recebido != NULL && recebido->dir != NULL){
+        no * p = recebido->dir;//vai pro filho a direita
         while(p->esq != NULL){//enquanto houver filho a esquerda
             p=p->esq;//percorre até achar o sucessor
         }
+        return p;//retorna o predecessor (preciso verificar no retrno se não é nulo)
     }
-    return p;//retorna o predecessor (preciso verificar no retrno se não é nulo)
+    else{
+        return NULL;
+    }
 }
 
 
@@ -294,35 +299,60 @@ no * buscaNO(no * raiz, no * recebido, char param){//se o nó existir, retorna e
 
 no ** cincoProx(int k, no * recebido,  double (* distancia)(const void * a, const void * b, char param)){
     no ** lista =  (no**) calloc(k,sizeof(no*));
-    no* pred = predecessor(recebido);
-    no * suc = sucessor(recebido);
     no * pai = NULL;
-    int cont = 0, contp = 0, conts = 0, metade = k/2, controle = 0;
+    int contTotal = 0, contp = 0, conts = 0, metade = k/2, controle = 0;
+    no * pred = recebido;
+    no * suc = recebido;
 
-    while(cont < k && controle < k){
-        if(contp <= metade){
+    if(recebido->esq != NULL){//possui pelo meons um filho a esquerda
+        for(contp; contp < (metade-1); contp++){//procuro metade do total solicita nos predecessores
+            pred = predecessor(pred);
             if(pred != NULL){
-                lista[cont] = pred;
-                pred = predecessor(pred);
-                contp++;
+                lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
+                contTotal++;//e aumentamos a contagem total de próximos encontrados
             }
         }
-        if(conts < metade+1){
-            if(suc != NULL){
-                lista[cont] = pred;
-                suc = sucessor(pred);
-                conts++;
+    }
+    if(recebido->dir != NULL){//posui pelo menos um filho a direita
+        for(conts = contTotal; conts < k; conts++){//depois de achar os predecessores, procura o resto nos sucessores
+            suc = sucessor(recebido);
+            if(suc!=NULL){
+                lista[contTotal] = suc;
+                contTotal++;
             }
         }
-        controle++;
     }
 
-    if(cont < k){
-        pai = recebido->pai;
-        lista[cont] = pai;
-        cont ++;
+    if(contTotal<k-1){
+        if(recebido->pai!=NULL){
+            lista[contTotal] = recebido->pai;
+            contTotal++;
+            while(contTotal < k){//se apenas o pai ainda não foi o suficiente para atigir a quantidade solicitada, devemos procurar no irmão e seus "sobrinhos"
+
+                pai = recebido->pai;
+                if(recebido == pai->dir){//se o nó recebido for um filho a direita, devemos procurar os predecessores do pai
+                   
+                   if(pai->esq != NULL){//o pai possui pelo menos um filho a esquerda
+                        pred = predecessor(pai);
+                        if(pred != NULL){
+                            lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
+                            contTotal++;//e aumentamos a contagem total de próximos encontrados
+                        }
+                    }
+                }
+                else{//o recebido é um filho a esquerda, logo, devemos procurar os sucessores do pai
+                     if(pai->dir != NULL){//o pai possui pelo menos um filho a direita
+                        suc = sucessor(pai);
+                        if(suc != NULL){
+                            lista[contTotal] = suc;//se existir um predecessor de fato, adicionamos ele na lista
+                            contTotal++;//e aumentamos a contagem total de próximos encontrados
+                        }
+                    }
+                }
+            }
+        }
     }
-    return lista;
+    return lista;  
 }
 
 void destruir(no * raiz){
