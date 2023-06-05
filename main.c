@@ -24,22 +24,17 @@ int compara_cidade(const void *a, const void *b, char param){
     float result = 0;
     if(param=='x'){//se for latitude
         result = (a1->latitude) - (a2->latitude);
-        //printf("\nLAT: %f - %f = %f = ",a1->latitude, a2->latitude, result);
     }
     else{
         result = (a1->longitude) - (a2->longitude);
-        //printf("\nLON: %f - %f = %f = ",a1->longitude, a2->latitude, result);
     }
     if(result < -0.1){//se a2 for maior a1, retorna 0
-        //printf("0");
         return 0;
     }
     else if(result >= -0.1 && result <= 0.1){//se for igual(com  um margem de "aproximação" mais ou menos 0.001) retorna -1
-        //printf("-1");
         return -1;
     }
     else{//se for menor retorna 1
-        //printf("1");
         return 1;
     }
 }
@@ -159,7 +154,6 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
         while (fscanf(arq, "%d,%[^,],%f,%f,%d,%d,%d,%d,%s\n",&(cidad->codIBGE),&(cidad->nome), &(cidad->latitude),&(cidad->longitude), &(cidad->capital), &(cidad->uf),&(cidad->siafi),&(cidad->ddd),&(cidad->fuso)) !=EOF)
         {   
             no * temp = criarNO(cidad,compara_cidade);
-            //print(temp,'c');
             cont ++;
             aux = criarNO(cidad, compara_cidade);
 
@@ -201,7 +195,7 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
             fastfood = (fastFood *)malloc(sizeof(fastFood));
         }
     }
-    printf("\nForam inseridos %d \"nozes\" na estrutura\n",cont);
+    printf("\nForam inseridos %d nos na estrutura\n",cont);
     fclose(arq);
 }
 
@@ -239,6 +233,7 @@ int main(){
 
     montarKD(&raiz, &indiceLista);
 
+
     //testes unitários verificando se a raiz é constante, pois como os dados são estáticos, a mediana deve permanecer a mesma sempre
     if(strcmp(nomeArq,"municipios.txt")==0){
         assert(((cidade*)raiz->dados)->codIBGE == 5205109);//se os dados forem de cidades, a mediana inicial, que é a raiz da árvore, deve ser o nó cujo codigoIBGE é 5205109, = Catalão
@@ -247,13 +242,14 @@ int main(){
         assert(((fastFood*)raiz->dados)->id == 4169);//se os dados forem de fastFood's a mediana inicial, que é a raiz da árvore, deve ser do nó cujo id é 4169 = Long John Silver's, Wichita-US
     }
 
+
     int input = 0;
     while(input != -1){
-        printf("\nEscollha um opcao:\n1-Mostrar mais proxima\n2-Mostrar as 5 mais proximas\n3-Verificar se o no esta na arvore\n4-Encerrar\n");
+        printf("\n\n\n\nEscollha um opcao:\n1-Mostrar mais proxima\n2-Mostrar as 5 mais proximas\n3-Verificar se o no esta na arvore\n4-Encerrar\n");
         scanf("%d",&input);
         switch(input){
             case 1:
-                printf("\n---MAIS PROXIMA---\nInformar as coordenadas, no formato 'latitude longitude'\n");//esta trabalhando com cidades
+                printf("\n\n\n\n---MAIS PROXIMA---\nInformar as coordenadas, no formato 'latitude longitude'\n");//esta trabalhando com cidades
                 if(strcmp(nomeArq,"municipios.txt")==0){
                     scanf("%f %f",&(tempC->latitude),&(tempC->longitude));//lê os dados
                     aux = criarNO(tempC, compara_cidade);//cria um nó para poder comparar na estrutura
@@ -268,7 +264,7 @@ int main(){
                 }
                 break;
             case 2:
-                printf("---K MAIS PROXIMAS---\nInformar as coordenadas, no formato 'latitude longitude'\n");
+                printf("\n\n\n\n---K MAIS PROXIMAS---\nInformar as coordenadas, no formato 'latitude longitude'\n");
                 
                 if(strcmp(nomeArq,"municipios.txt")==0){
                     scanf("%f %f",&(tempC->latitude),&(tempC->longitude));
@@ -296,22 +292,28 @@ int main(){
                 else{
                     scanf("%f %f",&(tempF->latitude),&(tempF->longitude));
                     aux = criarNO(tempF, compara_fastfood);
-                    aux = buscaNO(raiz,aux,'x');
-
-                    printf("\nProcurando os k nos mais proximos do seguinte no:\n!!!!!!!!!!");
-                    print(aux,'f');
-
-                    listaprox = kProx(5, aux, distancia_fastfood);//nesse caso k = 5, mas poderia ser qualquer valor
-                    
-                    printf("\nENCONTRADOS:\n===============");
-                    for(int i = 0; i < 5; i++){//nesse caso k = 5, mas poderia ser qualquer valor
-                        print(listaprox[i],'f');
+                    temp = buscaNO(raiz,aux,'x');
+                     if(aux->compara(aux,temp,'x') == -1 && aux->compara(aux,temp,'y') == -1){//o nó existe na estrutura
+                        listaprox = kProx(5, temp, distancia_fastfood);//nesse caso k = 5, mas poderia ser qualquer valor
+                        printf("\nENCONTRADOS:\n===============");
+                        for(int i = 0; i < 5; i++){
+                            print(listaprox[i],'f');
+                        }
+                        printf("\n===============");
                     }
-                    printf("\n===============");
+                    else{//o nó não existe na estrutura, logo, temp é o pai do nó caso ele estivesse na estrutura, logo, temp é um dos mais próximos também
+                        print(temp,'f');
+                        listaprox = kProx(4, temp, distancia_fastfood);//nesse caso k = 4, mas poderia ser qualquer valor, pois já temos 1, que é o "pai"
+                        printf("\nENCONTRADOS:\n===============");
+                        for(int i = 0; i < 4; i++){
+                            print(listaprox[i],'f');
+                        }
+                        printf("\n===============");               
+                    }
                 }
                 break;
             case 3:
-                printf("---Verificar presença---\nInformar as coordenadas, no formato 'latitude longitude'\n");
+                printf("---Verificar preseca---\nInformar as coordenadas, no formato 'latitude longitude'\n");
 
                 if(strcmp(nomeArq,"municipios.txt")==0){//estamos trabalhanod com nós do tipo "cidade"
                     scanf("%f %f",&(tempC->latitude),&(tempC->longitude));

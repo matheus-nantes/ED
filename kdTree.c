@@ -23,7 +23,7 @@ void inserirNO(no ** raiz, no * recebido, char param){//x é longitude, e y é l
     else{
         if(param == 'x'){
             if(recebido->compara((*raiz)->dados,recebido->dados,param) == 1){//o novo nó é maior em latitude
-                if((*raiz)->esq == NULL){//se não houver filho a esquerda, enserimos lá
+                if((*raiz)->esq == NULL){//se não houver filho a esquerda, inserimos lá
                     (*raiz)->esq = recebido;
                     recebido->pai = *raiz;
                 }
@@ -79,16 +79,16 @@ void construirKD(no ** raiz, no ** indice, no * inicio, no * fim, char parametro
     no * fimProx = NULL;
     no * inicioProx = NULL;
     if(inicio->dir == fim){
-        inicio->pai = NULL;//zera os campos de referencia dos nózes a ser inserido
+        inicio->pai = NULL;//zera os campos de referencia do nó a ser inserido
         inicio->dir = NULL;
         inicio->esq = NULL;
 
-        fim->pai = NULL;//zera os campos de referencia dos nózes a ser inserido
+        fim->pai = NULL;//zera os campos de referencia do outro nó a ser inserido
         fim->dir = NULL;
         fim->esq = NULL;
 
         if(inicio->compara(inicio->dados,fim->dados,parametro)==1){//comparo os dois únicos nós da sublista, e insiro o menor, depois o maior
-            //se "fim" for menor, insiro ele primeiro
+            //se "fim" for menor, insiro ele primeiro, depois "fim"
             inserirNO(raiz,fim,'x');
             inserirNO(raiz,inicio,'x');
         }
@@ -149,8 +149,8 @@ int insertionSort(no**indice, no * atual, no * fim, char parametro){
                 }
                 p = p->dir;
             }
-            if(atual != menor){
-                troca(atual, menor);
+            if(atual != menor){//se o elemento "selecionado" não for o menor do subconjunto a direita dele...
+                troca(atual, menor);//troca ele de posição com o menor elemento do subconjunto, fazendo com que a lista fique ordenada crescentemente
             }
             cont ++;
             atual = atual->dir;
@@ -173,7 +173,7 @@ no * predecessor(no * recebido){
     if(recebido!=NULL && recebido->esq != NULL){
         no * p = recebido->esq;//vai pro filho a esquerda
         while(p->dir != NULL){//enquanto houver filho a direita
-            p=p->dir;//percorre até achar o predecessor (preciso verificar no retrno se não é nulo)
+            p=p->dir;//percorre até achar o predecessor (preciso verificar no retorno se não é nulo)
         }
         return p;//retorna o predecessor
     }
@@ -248,7 +248,7 @@ no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const v
 
 }
 
-no * buscaNO(no * raiz, no * recebido, char param){//se o nó existir, retorna ele mesmo, senão, retorn o pai que esse nó teria
+no * buscaNO(no * raiz, no * recebido, char param){//se o nó existir, retorna ele mesmo, senão, retorna o pai que esse nó teria
     if(raiz == NULL){
         printf("Não há dados na estrutura");
     }
@@ -305,43 +305,43 @@ no ** kProx(int k,no * recebido,  double (* distancia)(const void * a, const voi
     no * suc = sucessor(recebido);
 
     
-    if(pred != NULL){
-        lista[contTotal++] = pred;
-        while(pred->pai != recebido && contp < metade){
-            pred = pred->pai;
-            lista[contTotal++] = pred;
-            contp++;
+    if(pred != NULL){//se possuir predecessor
+        lista[contTotal++] = pred;//adiciona ele
+        while(pred->pai != recebido && contp < metade){//enquanto o predecessor não for o filho imediatamente á esquerda do "recebido" e não tiver atingido o "limite de predecessores"(no caso ideal, metade da lista é de predecessores e metade de sucessores)
+            pred = pred->pai;//avança o predecessor um "nível" á cima
+            lista[contTotal++] = pred;//adicona "novo predecessor"
+            contp++;//aumenta a "quantidade de predecessores"
         }
     }
 
-    if(suc != NULL){    
-        lista[contTotal++] = suc;
-        while(suc->pai != recebido && conts < metade){
-            suc = suc->pai;
-            lista[contTotal++] = suc;
-            conts++;
+    if(suc != NULL){//se houver sucessor
+        lista[contTotal++] = suc;//adiciona ele
+        while(suc->pai != recebido && conts < metade){//enquanto o sucessor não for o filho imediatamente á direita do recebido e não tiver atingido o "limite de sucessores"
+            suc = suc->pai;//avança o sucessor "um nível acima"
+            lista[contTotal++] = suc;//adiciona o "novo sucessor"
+            conts++;//aumenta a "quantidade de sucessores"
         }
     }
 
     if(pred != NULL){
         while(contTotal < k && pred->pai != recebido){//se ainda faltar elementos na lista, e houver predecessores para inserir
-            pred = pred->pai;
+            pred = pred->pai;//subimos um nível novamente
             lista[contTotal++] = pred;
         }
     }
 
     if(suc != NULL){
         while(contTotal < k && suc->pai != recebido){//se ainda faltar elementos na lista, e ainda houver sucessor para inserir
-            suc = suc->pai;
+            suc = suc->pai;//subimos um nível noevamente
             lista[contTotal++] = suc;
         }
     }
     
     //se faltar elementos e não houver mais nenhum descendente do nó para inserir na lista, subimos a busca em um nível
-    while(contTotal < k){
+    while(contTotal < k){//este while faz com que a "subida de nível do recebido" seja realizada enquanto for preciso
         if(recebido->pai != NULL){//se não for a raiz
             pai = recebido->pai;
-            lista[contTotal++] = pai;//adicionamos o pai
+            lista[contTotal++] = pai;//adicionamos o pai á lista
 
             if(pai->esq == recebido){//se o recebido é um filho a esquerda, devemos procurar na subárvore á direita
                 if(pai->dir != NULL){//se houver irmão
@@ -352,17 +352,17 @@ no ** kProx(int k,no * recebido,  double (* distancia)(const void * a, const voi
 
                     suc = sucessor(recebido);
 
-                    if(pred != NULL){
-                        lista[contTotal++] = pred;
-                        while(pred->pai != recebido && contTotal<k){
+                    if(pred != NULL){//se o irmão possuir predecessor
+                        lista[contTotal++] = pred;//adicionamos ele
+                        while(pred->pai != recebido && contTotal<k){//e continuamos procurando nos predecessores, subindo de nível, enquanto for possível e preciso
                             pred = pred->pai;
                             lista[contTotal++] = pred;
                         }
                     }
 
-                    if(suc != NULL){    
-                        lista[contTotal++] = suc;
-                        while(suc->pai != recebido && contTotal<k){
+                    if(suc != NULL){    //se o irmão possuir sucessor
+                        lista[contTotal++] = suc;//adiconamos ele
+                        while(suc->pai != recebido && contTotal<k){//e continuamos inserindo os sucessores, enquanto for preciso e possível
                             suc = suc->pai;
                             lista[contTotal++] = suc;
                         }
@@ -372,6 +372,8 @@ no ** kProx(int k,no * recebido,  double (* distancia)(const void * a, const voi
 
             }
             else{//o recebido é um filho a direita
+
+                //os casos deste else são os mesmos do "seu if correspondente"
 
                 if(pai->esq != NULL){//se houver irmão
                     lista[contTotal++] = pai->esq;//adicionamos o irmão
@@ -402,75 +404,17 @@ no ** kProx(int k,no * recebido,  double (* distancia)(const void * a, const voi
             }
         }
     }
-
-    // if(recebido->esq != NULL){//possui pelo meons um filho a esquerda
-    //     for(contp; contp < metade; contp++){//procuro metade do total solicita nos predecessores
-    //         pred = predecessor(pred);
-    //         if(pred != NULL){
-    //             lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
-    //             contTotal++;//e aumentamos a contagem total de próximos encontrados
-    //         }
-    //     }
-    // }
-    // if(recebido->dir != NULL){//posui pelo menos um filho a direita
-    //     for(conts = contTotal; conts < k; conts++){//depois de achar os predecessores, procura o resto nos sucessores
-    //         suc = sucessor(suc);
-    //         if(suc!=NULL){
-    //             lista[contTotal] = suc;
-    //             contTotal++;
-    //         }
-    //     }
-    // }
-
-    // if(contTotal<k){
-    //     if(recebido->pai!=NULL){
-    //         pai = recebido->pai;
-    //         lista[contTotal] = pai;
-    //         contTotal++;
-    //         while(contTotal < k){//se apenas o pai ainda não foi o suficiente para atigir a quantidade solicitada, devemos procurar no irmão e seus "sobrinhos"
-
-    //             if(recebido == pai->dir){//se o nó recebido for um filho a direita, devemos procurar os predecessores do pai
-                   
-    //                if(pai->esq != NULL){//o pai possui pelo menos um filho a esquerda
-    //                     pred = predecessor(pai);
-    //                     if(pred != NULL){
-    //                         lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
-    //                         contTotal++;//e aumentamos a contagem total de próximos encontrados
-    //                     }
-    //                 }
-    //                 else{
-    //                     pai = pai->pai;
-    //                 }
-    //             }
-    //             else{//o recebido é um filho a esquerda, logo, devemos procurar os sucessores do pai
-    //                  if(pai->dir != NULL){//o pai possui pelo menos um filho a direita
-    //                     suc = sucessor(pai);
-    //                     if(suc != NULL){
-    //                         lista[contTotal] = suc;//se existir um predecessor de fato, adicionamos ele na lista
-    //                         contTotal++;//e aumentamos a contagem total de próximos encontrados
-    //                         while(suc->pai != pai){
-
-    //                         }
-    //                     }
-    //                 }
-    //                 else{
-    //                     pai = pai->pai;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-    return lista;  
+    return lista;  //após todas essas operações retorna a lista com os k vizinhos mais próximos
 }
 
 void destruir(no * raiz){
-    if(raiz->esq != NULL){
+    if(raiz->esq != NULL){//procura nó folha pela esquerda
          destruir(raiz->esq);
     }
     if(raiz->dir != NULL){
-        destruir(raiz->dir);
+        destruir(raiz->dir);//procura nó folha pela direita
     }
     if(raiz->esq == NULL && raiz->dir == NULL){
-        free(raiz);
+        free(raiz);//se chegar em um nó folha o exclui. Através da recursão, vem excluindo tudo de baixo pra cima
     }
 }
