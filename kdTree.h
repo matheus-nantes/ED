@@ -36,7 +36,7 @@ no * encontrarMaisProximo(no * raiz,no * recebido,  double (* distancia)(const v
 
 no * buscaNO(no * raiz, no * recebido, char param);
 
-no ** cincoProx(int k, no * recebido,  double (*distancia)(const void * a, const void * b, char param));
+no ** kProx(int k, no * recebido,  double (*distancia)(const void * a, const void * b, char param));
 
 void destruir(no * raiz);
 

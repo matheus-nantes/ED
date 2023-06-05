@@ -61,7 +61,7 @@ double distancia_cidade(const void *a, const void *b, char param){
 
 
 typedef struct fastFood{
-    char id[10];
+    int id;
     float latitude;
     float longitude;
     char address[MAXCHAR];
@@ -181,7 +181,7 @@ void montarLista(no ** indice,char nomeArq[MAXCHAR]){
     else if(strcmp(nomeArq,"fastFood.txt")==0){
         fastFood * fastfood = (fastFood*) malloc(sizeof(fastFood));
  
-        while (fscanf(arq, "%[^,],%[^,],%[^,],%[^,],%f,%f,%[^,],%[^,],%[^,],%[^\n]\n",fastfood->id,fastfood->address,fastfood->city,fastfood->country,&(fastfood->latitude),&(fastfood->longitude),fastfood->name,fastfood->postalCode,fastfood->province,fastfood->websites)!=EOF)
+        while (fscanf(arq, "%d,%[^,],%[^,],%[^,],%f,%f,%[^,],%[^,],%[^,],%[^\n]\n",&(fastfood->id),fastfood->address,fastfood->city,fastfood->country,&(fastfood->latitude),&(fastfood->longitude),fastfood->name,fastfood->postalCode,fastfood->province,fastfood->websites)!=EOF)
         {
             cont ++;
             aux = criarNO(fastfood, compara_fastfood);
@@ -214,8 +214,13 @@ int main(){
     printf("\nInforme o nome do arquivo que estao os dados: ");
     scanf("%s",nomeArq);
     no * aux = NULL;
+
+    no * temp = NULL;
+
     no * raiz = NULL;
+
     cidade * tempC = NULL;
+
     fastFood * tempF = NULL;
 
     no * encontrado = NULL;
@@ -234,11 +239,17 @@ int main(){
 
     montarKD(&raiz, &indiceLista);
 
-    printf("\nMedjiaiana: %d",((cidade*)raiz->dados)->codIBGE);
+    //testes unitários verificando se a raiz é constante, pois como os dados são estáticos, a mediana deve permanecer a mesma sempre
+    if(strcmp(nomeArq,"municipios.txt")==0){
+        assert(((cidade*)raiz->dados)->codIBGE == 5205109);//se os dados forem de cidades, a mediana inicial, que é a raiz da árvore, deve ser o nó cujo codigoIBGE é 5205109, = Catalão
+    }
+    else{
+        assert(((fastFood*)raiz->dados)->id == 4169);//se os dados forem de fastFood's a mediana inicial, que é a raiz da árvore, deve ser do nó cujo id é 4169 = Long John Silver's, Wichita-US
+    }
 
     int input = 0;
     while(input != -1){
-        printf("\nEscollha um opcao:\n1-Mostrar mais proxima\n2-Mostrar as 5 mais proximas\n3-Encerrar\n");
+        printf("\nEscollha um opcao:\n1-Mostrar mais proxima\n2-Mostrar as 5 mais proximas\n3-Verificar se o no esta na arvore\n4-Encerrar\n");
         scanf("%d",&input);
         switch(input){
             case 1:
@@ -262,13 +273,25 @@ int main(){
                 if(strcmp(nomeArq,"municipios.txt")==0){
                     scanf("%f %f",&(tempC->latitude),&(tempC->longitude));
                     aux = criarNO(tempC, compara_cidade);
-                    aux = buscaNO(raiz,aux,'x');
-                    listaprox = cincoProx(5, aux, distancia_cidade);//nesse caso k = 5, mas poderia ser qualquer valor
-                    printf("\nENCONTRADOS:\n===============");
-                    for(int i = 0; i < 5; i++){//nesse caso k = 5, mas poderia ser qualquer valor
-                        print(listaprox[i],'c');
+                    temp = buscaNO(raiz,aux,'x');
+
+                    if(aux->compara(aux,temp,'x') == -1 && aux->compara(aux,temp,'y') == -1){//o nó existe na estrutura
+                        listaprox = kProx(5, temp, distancia_cidade);//nesse caso k = 5, mas poderia ser qualquer valor
+                        printf("\nENCONTRADOS:\n===============");
+                        for(int i = 0; i < 5; i++){
+                            print(listaprox[i],'c');
+                        }
+                        printf("\n===============");
                     }
-                    printf("\n===============");
+                    else{//o nó não existe na estrutura, logo, temp é o pai do nó caso ele estivesse na estrutura, logo, temp é um dos mais próximos também
+                        print(temp,'c');
+                        listaprox = kProx(4, temp, distancia_cidade);//nesse caso k = 4, mas poderia ser qualquer valor, pois já temos 1, que é o "pai"
+                        printf("\nENCONTRADOS:\n===============");
+                        for(int i = 0; i < 4; i++){
+                            print(listaprox[i],'c');
+                        }
+                        printf("\n===============");               
+                    }
                 }
                 else{
                     scanf("%f %f",&(tempF->latitude),&(tempF->longitude));
@@ -278,16 +301,45 @@ int main(){
                     printf("\nProcurando os k nos mais proximos do seguinte no:\n!!!!!!!!!!");
                     print(aux,'f');
 
-                    listaprox = cincoProx(5, aux, distancia_fastfood);//nesse caso k = 5, mas poderia ser qualquer valor
+                    listaprox = kProx(5, aux, distancia_fastfood);//nesse caso k = 5, mas poderia ser qualquer valor
                     
-                    printf("\nENCONTRADOS:===============");
+                    printf("\nENCONTRADOS:\n===============");
                     for(int i = 0; i < 5; i++){//nesse caso k = 5, mas poderia ser qualquer valor
                         print(listaprox[i],'f');
-                        printf("\n===============");
                     }
+                    printf("\n===============");
                 }
                 break;
             case 3:
+                printf("---Verificar presença---\nInformar as coordenadas, no formato 'latitude longitude'\n");
+
+                if(strcmp(nomeArq,"municipios.txt")==0){//estamos trabalhanod com nós do tipo "cidade"
+                    scanf("%f %f",&(tempC->latitude),&(tempC->longitude));
+                    aux = criarNO(tempC, compara_cidade);
+                    temp = buscaNO(raiz,aux,'x');
+
+                    if(aux->compara(aux,temp,'x') == -1 && aux->compara(aux,temp,'y') == -1){//o nó existe na estrutura
+                        print(temp,'c');
+                    }
+                    else{
+                        printf("\nNao ha nenhum no na estrutura com esse valores");
+                    }
+                }
+                else{//estamos trabalhando com "fastfood"
+                     scanf("%f %f",&(tempC->latitude),&(tempC->longitude));
+                    aux = criarNO(tempC, compara_cidade);
+                    temp = buscaNO(raiz,aux,'x');
+
+                    if(aux->compara(aux,temp,'x') == -1 && aux->compara(aux,temp,'y') == -1){//o nó existe na estrutura
+                        print(temp,'c');
+                    }
+                    else{
+                        printf("\nNao ha nenhum no na estrutura com esse valores");
+                    }
+                }
+                break;
+
+            case 4:
                 destruir(raiz);
                 free(raiz);
                 input=-1;  

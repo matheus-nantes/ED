@@ -297,61 +297,169 @@ no * buscaNO(no * raiz, no * recebido, char param){//se o nó existir, retorna e
 
 }
 
-no ** cincoProx(int k, no * recebido,  double (* distancia)(const void * a, const void * b, char param)){
+no ** kProx(int k,no * recebido,  double (* distancia)(const void * a, const void * b, char param)){
     no ** lista =  (no**) calloc(k,sizeof(no*));
     no * pai = NULL;
     int contTotal = 0, contp = 0, conts = 0, metade = k/2, controle = 0;
-    no * pred = recebido;
-    no * suc = recebido;
+    no * pred = predecessor(recebido);
+    no * suc = sucessor(recebido);
 
-    if(recebido->esq != NULL){//possui pelo meons um filho a esquerda
-        for(contp; contp < (metade-1); contp++){//procuro metade do total solicita nos predecessores
-            pred = predecessor(pred);
-            if(pred != NULL){
-                lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
-                contTotal++;//e aumentamos a contagem total de próximos encontrados
-            }
-        }
-    }
-    if(recebido->dir != NULL){//posui pelo menos um filho a direita
-        for(conts = contTotal; conts < k; conts++){//depois de achar os predecessores, procura o resto nos sucessores
-            suc = sucessor(recebido);
-            if(suc!=NULL){
-                lista[contTotal] = suc;
-                contTotal++;
-            }
+    
+    if(pred != NULL){
+        lista[contTotal++] = pred;
+        while(pred->pai != recebido && contp < metade){
+            pred = pred->pai;
+            lista[contTotal++] = pred;
+            contp++;
         }
     }
 
-    if(contTotal<k-1){
-        if(recebido->pai!=NULL){
-            lista[contTotal] = recebido->pai;
-            contTotal++;
-            while(contTotal < k){//se apenas o pai ainda não foi o suficiente para atigir a quantidade solicitada, devemos procurar no irmão e seus "sobrinhos"
+    if(suc != NULL){    
+        lista[contTotal++] = suc;
+        while(suc->pai != recebido && conts < metade){
+            suc = suc->pai;
+            lista[contTotal++] = suc;
+            conts++;
+        }
+    }
 
-                pai = recebido->pai;
-                if(recebido == pai->dir){//se o nó recebido for um filho a direita, devemos procurar os predecessores do pai
+    if(pred != NULL){
+        while(contTotal < k && pred->pai != recebido){//se ainda faltar elementos na lista, e houver predecessores para inserir
+            pred = pred->pai;
+            lista[contTotal++] = pred;
+        }
+    }
+
+    if(suc != NULL){
+        while(contTotal < k && suc->pai != recebido){//se ainda faltar elementos na lista, e ainda houver sucessor para inserir
+            suc = suc->pai;
+            lista[contTotal++] = suc;
+        }
+    }
+    
+    //se faltar elementos e não houver mais nenhum descendente do nó para inserir na lista, subimos a busca em um nível
+    while(contTotal < k){
+        if(recebido->pai != NULL){//se não for a raiz
+            pai = recebido->pai;
+            lista[contTotal++] = pai;//adicionamos o pai
+
+            if(pai->esq == recebido){//se o recebido é um filho a esquerda, devemos procurar na subárvore á direita
+                if(pai->dir != NULL){//se houver irmão
+                    lista[contTotal++] = pai->dir;//adicionamos o irmão
+                    recebido = pai->dir;//atualizamos o "recebido", para que a busca seja realizada agora na subarvore do irmão
+
+                    pred = predecessor(recebido);
+
+                    suc = sucessor(recebido);
+
+                    if(pred != NULL){
+                        lista[contTotal++] = pred;
+                        while(pred->pai != recebido && contTotal<k){
+                            pred = pred->pai;
+                            lista[contTotal++] = pred;
+                        }
+                    }
+
+                    if(suc != NULL){    
+                        lista[contTotal++] = suc;
+                        while(suc->pai != recebido && contTotal<k){
+                            suc = suc->pai;
+                            lista[contTotal++] = suc;
+                        }
+                    }
+
+                }
+
+            }
+            else{//o recebido é um filho a direita
+
+                if(pai->esq != NULL){//se houver irmão
+                    lista[contTotal++] = pai->esq;//adicionamos o irmão
+                    recebido = pai->esq;//atualizamos o "recebido", para que a busca seja realizada agora na subarvore do irmão
+
+                    pred = predecessor(recebido);
+
+                    suc = sucessor(recebido);
+
+                    if(pred != NULL){
+                        lista[contTotal++] = pred;
+                        while(pred->pai != recebido && contTotal<k){
+                            pred = pred->pai;
+                            lista[contTotal++] = pred;
+                        }
+                    }
+
+                    if(suc != NULL){    
+                        lista[contTotal++] = suc;
+                        while(suc->pai != recebido && contTotal<k){
+                            suc = suc->pai;
+                            lista[contTotal++] = suc;
+                        }
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    // if(recebido->esq != NULL){//possui pelo meons um filho a esquerda
+    //     for(contp; contp < metade; contp++){//procuro metade do total solicita nos predecessores
+    //         pred = predecessor(pred);
+    //         if(pred != NULL){
+    //             lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
+    //             contTotal++;//e aumentamos a contagem total de próximos encontrados
+    //         }
+    //     }
+    // }
+    // if(recebido->dir != NULL){//posui pelo menos um filho a direita
+    //     for(conts = contTotal; conts < k; conts++){//depois de achar os predecessores, procura o resto nos sucessores
+    //         suc = sucessor(suc);
+    //         if(suc!=NULL){
+    //             lista[contTotal] = suc;
+    //             contTotal++;
+    //         }
+    //     }
+    // }
+
+    // if(contTotal<k){
+    //     if(recebido->pai!=NULL){
+    //         pai = recebido->pai;
+    //         lista[contTotal] = pai;
+    //         contTotal++;
+    //         while(contTotal < k){//se apenas o pai ainda não foi o suficiente para atigir a quantidade solicitada, devemos procurar no irmão e seus "sobrinhos"
+
+    //             if(recebido == pai->dir){//se o nó recebido for um filho a direita, devemos procurar os predecessores do pai
                    
-                   if(pai->esq != NULL){//o pai possui pelo menos um filho a esquerda
-                        pred = predecessor(pai);
-                        if(pred != NULL){
-                            lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
-                            contTotal++;//e aumentamos a contagem total de próximos encontrados
-                        }
-                    }
-                }
-                else{//o recebido é um filho a esquerda, logo, devemos procurar os sucessores do pai
-                     if(pai->dir != NULL){//o pai possui pelo menos um filho a direita
-                        suc = sucessor(pai);
-                        if(suc != NULL){
-                            lista[contTotal] = suc;//se existir um predecessor de fato, adicionamos ele na lista
-                            contTotal++;//e aumentamos a contagem total de próximos encontrados
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                if(pai->esq != NULL){//o pai possui pelo menos um filho a esquerda
+    //                     pred = predecessor(pai);
+    //                     if(pred != NULL){
+    //                         lista[contTotal] = pred;//se existir um predecessor de fato, adicionamos ele na lista
+    //                         contTotal++;//e aumentamos a contagem total de próximos encontrados
+    //                     }
+    //                 }
+    //                 else{
+    //                     pai = pai->pai;
+    //                 }
+    //             }
+    //             else{//o recebido é um filho a esquerda, logo, devemos procurar os sucessores do pai
+    //                  if(pai->dir != NULL){//o pai possui pelo menos um filho a direita
+    //                     suc = sucessor(pai);
+    //                     if(suc != NULL){
+    //                         lista[contTotal] = suc;//se existir um predecessor de fato, adicionamos ele na lista
+    //                         contTotal++;//e aumentamos a contagem total de próximos encontrados
+    //                         while(suc->pai != pai){
+
+    //                         }
+    //                     }
+    //                 }
+    //                 else{
+    //                     pai = pai->pai;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     return lista;  
 }
 
