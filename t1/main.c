@@ -340,7 +340,6 @@ int main(){
                     }
                 }
                 break;
-
             case 4:
                 destruir(raiz);
                 free(raiz);
